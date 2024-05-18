@@ -22,6 +22,8 @@ Biometric identification systems analyze unique physical characteristics such as
 
 ## Solution Overview
 
+![Proposed System](Documentation/assests/Proposed_system_model.png)
+
 Our proposed solution combines several AI models to generate suspect face sketches based on given textual input. Specifically, our system includes:
 
 - **Prompt Generator LLM:** Extracts important facial features from suspect descriptions and refines them for image generation.
@@ -36,11 +38,12 @@ The positive impact of our solution within the community is significant, enhanci
 
 ## Proposed Architecture
 
-![System Architecture](Documentation/assets/System_Architecture.png)
+![System Architecture](Documentation/assests/System_Architecture.png)
 
 - Prompt Generator LLM
 - Image Generator Stable Diffusion Model
 - Image-to-Image Refiner
+
 
 **Collaborators:**
 
