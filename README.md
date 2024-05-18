@@ -58,4 +58,6 @@ This repository contains the source code and supporting documentation for this p
 
 Join us in our mission to transform forensic identification and support law enforcement with cutting-edge AI technology. Explore our repositories to learn more about our project, contribute, and collaborate with Team Decoders.
 
+![Logo](Documentation/assests/logo_banner.jpg)
+
 
