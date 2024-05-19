@@ -1,43 +1,58 @@
-/** Add fonts into your Next.js project:
-
-import { Inter } from 'next/font/google'
-
-inter({
-  subsets: ['latin'],
-  display: 'swap',
-})
-
-To read more about using these font, please visit the Next.js documentation:
-- App Directory: https://nextjs.org/docs/app/building-your-application/optimizing/fonts
-- Pages Directory: https://nextjs.org/docs/pages/building-your-application/optimizing/fonts
-**/
+'use client';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
+import Link from "next/link"
+import { Skeleton } from "@/components/ui/skeleton"
+
 
 export function RefinePage() {
+  const [imageSrc, setImageSrc] = useState(null);
+
+  useEffect(() => {
+    const fetchImage = async () => {
+      const response = await fetch('https://picsum.photos/200/300');
+      setImageSrc(response.url);
+    };
+
+    fetchImage();
+  }, []);
+
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-[#12012e] to-[#732bbf] dark:from-[#12012e] dark:to-[#732bbf]">
       <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg w-full max-w-2xl">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-800">
           <h2 className="text-lg font-semibold">Criminal Identification</h2>
-          <Button size="icon" variant="ghost">
-            <XIcon className="h-5 w-5" />
-          </Button>
+          <Link href={'/'}>
+            <Button size="icon" variant="ghost">
+              <XIcon className="h-5 w-5" />
+            </Button>
+          </Link>
         </div>
         <div className="p-8">
           <div className="flex justify-center mb-6">
-            <img
-              alt="Generated Face"
-              className="rounded-lg"
-              height="300"
-              src="/result.jpg"
-              style={{
-                aspectRatio: "300/300",
-                objectFit: "cover",
-              }}
-              width="300"
-            />
+          {imageSrc ? (
+              <img
+                alt="Generated Face"
+                className="rounded-lg"
+                height="300"
+                src={imageSrc}
+                style={{
+                  aspectRatio: "300/300",
+                  objectFit: "cover",
+                }}
+                width="300"
+              />
+            ) : (
+              <div className="flex flex-col space-y-3">
+                <Skeleton className="h-[250px] w-[300px] rounded-xl" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-[250px]" />
+                  <Skeleton className="h-4 w-[200px]" />
+                </div>
+              </div>
+            )}
           </div>
            <div className="grid gap-4">
             <div className="grid grid-cols-[1fr_auto] items-center gap-2">
@@ -69,12 +84,16 @@ export function RefinePage() {
             </div>
           </div>
           <div className="flex justify-center gap-4 mt-6">
+            <Link href={'/ResultsPageMain'}>
             <Button className="w-full" size="lg">
               Refine
             </Button>
-            <Button className="w-full" size="lg" variant="outline">
-              New Generation
-            </Button>
+            </Link>
+            <Link href={'/'}>
+              <Button className="w-full" size="lg" variant="outline">
+                New Generation
+              </Button>
+            </Link>
           </div>
         </div>
         <div className="bg-gray-100 dark:bg-gray-800 px-6 py-4 rounded-b-lg border-t border-gray-200 dark:border-gray-800 text-sm text-gray-500 dark:text-gray-400">
@@ -104,4 +123,3 @@ function XIcon(props) {
     </svg>
   )
 }
-

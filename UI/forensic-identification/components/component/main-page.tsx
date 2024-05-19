@@ -11,16 +11,34 @@ To read more about using these font, please visit the Next.js documentation:
 - App Directory: https://nextjs.org/docs/app/building-your-application/optimizing/fonts
 - Pages Directory: https://nextjs.org/docs/pages/building-your-application/optimizing/fonts
 **/
+'use client';
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { CardTitle, CardDescription, CardHeader, CardContent, Card } from "@/components/ui/card"
+import  Link from "next/link"
+import { useToast } from "@/components/ui/use-toast"
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card"
+
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 
 export function MainPage() {
+  const { toast } = useToast()
+
+
   return (
     <div className="flex flex-col h-screen">
       <header className="bg-gray-900/65 text-gray-50 px-4 py-3 flex items-center justify-between fixed top-0 left-0 right-0 backdrop-blur-sm z-50">
-        <h1 className="text-lg font-semibold">Criminal Identification</h1>
+        <h1 className="text-lg font-semibold">Criminal Identification Platform</h1>
         <div className="flex items-center gap-2">
           <Button
             className="rounded-full bg-gray-50 bg-opacity-10 p-2 text-gray-50 transition-colors hover:bg-gray-50/20 focus:outline-none focus:ring-2 focus:ring-gray-950 focus:ring-offset-2"
@@ -48,9 +66,9 @@ export function MainPage() {
           </Button>
         </div>
       </header>
-
+      
       <section className="w-full">
-      <div className="flex-1 flex bg-gradient-to-br from-[#12012e] to-[#732bbf] px-4 p-16 mt-16">
+      <div className="flex-1 flex bg-gradient-to-br from-[#12012e] to-[#732bbf] px-10 p-16 mt-16">
         <div className="flex-1 flex flex-col items-center justify-center px-10">
           <div className="space-y-2 text-center">
             <h1 className="text-3xl font-bold tracking-tight text-gray-50">Criminal Identification</h1>
@@ -60,17 +78,35 @@ export function MainPage() {
             <div className="relative w-full">
               <Textarea
                 className="w-full rounded-lg bg-gray-50 bg-opacity-10 px-4 py-3 text-sm font-medium text-gray-50 shadow-sm transition-colors hover:bg-gray-50/20 focus:outline-none focus:ring-2 focus:ring-gray-950 focus:ring-offset-2 resize-none min-h-[100px] max-h-[300px]"
-                placeholder="Enter details"
+                placeholder="Enter details of the suspect"
               />
               <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center space-x-2">
-                <Button
-                  className="rounded-full bg-gray-50 bg-opacity-10 p-2 text-gray-50 transition-colors hover:bg-gray-50/20 focus:outline-none focus:ring-2 focus:ring-gray-950 focus:ring-offset-2"
-                  size="icon"
-                  variant="ghost"
-                >
-                  <MicIcon className="h-5 w-5 fill-gray-50" />
-                  <span className="sr-only">Voice Input</span>
-                </Button>
+              
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Button
+                      className="rounded-full bg-gray-50 bg-opacity-10 p-2 text-gray-50 transition-colors hover:bg-gray-50/20 focus:outline-none focus:ring-2 focus:ring-gray-950 focus:ring-offset-2"
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => {
+                        toast({
+                          title: "Voice input not Available!",
+                          description: "Friday, February 10, 2023 at 5:57 PM",
+                        })
+                      }}
+                    >
+                      <MicIcon className="h-5 w-5 fill-gray-50" />
+                      <span className="sr-only">Voice Input</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Voice Input</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                <TooltipTrigger>
+                <Link href="/ResultsPageMain">
                 <Button
                   //make it go to refinePage when clicked
                   className="rounded-full bg-gray-50 bg-opacity-10 p-2 text-gray-50 transition-colors hover:bg-gray-50/20 focus:outline-none focus:ring-2 focus:ring-gray-950 focus:ring-offset-2"
@@ -80,10 +116,20 @@ export function MainPage() {
                   <SendIcon className="h-5 w-5 fill-gray-50" />
                   <span className="sr-only">Send</span>
                 </Button>
+                </Link>
+                </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Send for Generation</p>
+                  </TooltipContent>
+                </Tooltip>
+                </TooltipProvider>
               </div>
             </div>
           </div>
         </div>
+        
+        <HoverCard>
+        <HoverCardTrigger>
         <div className="flex-1 flex items-center justify-center transition-transform transition-filter duration-300 ease-in-out hover:scale-105 hover:brightness-110">
           <img
             alt="Criminal Identification"
@@ -97,6 +143,12 @@ export function MainPage() {
             width={450}
           />
         </div>
+        </HoverCardTrigger>
+        <HoverCardContent>
+          Criminal Identification Framework – created and maintained by @Decoders.
+        </HoverCardContent>
+        </HoverCard>
+
       </div>
       </section>
 
