@@ -1,3 +1,7 @@
+# Stable Diffusion Based Criminal Face Generation Platform for Forensic Identification
+
+This platform uses a Stable Diffusion model for generating criminal faces based on forensic descriptions. As part of this process, we utilize OpenAI's Whisper-medium model to transcribe audio input into text, which then serves as a prompt for the face generation model.
+
 ### Audio to Text
 
 This directory contains the code for converting audio input into text using OpenAI's Whisper-medium model.
