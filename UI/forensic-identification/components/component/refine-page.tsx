@@ -6,8 +6,11 @@ import { Slider } from "@/components/ui/slider"
 import Link from "next/link"
 import { Skeleton } from "@/components/ui/skeleton"
 
+import { useSearchParams } from "next/navigation";
+
 
 export function RefinePage() {
+  const searchParams = useSearchParams();
   const [imageSrc, setImageSrc] = useState(null);
 
   useEffect(() => {
@@ -23,7 +26,11 @@ export function RefinePage() {
     <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-[#12012e] to-[#732bbf] dark:from-[#12012e] dark:to-[#732bbf]">
       <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg w-full max-w-2xl">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-800">
-          <h2 className="text-lg font-semibold">Criminal Identification</h2>
+        <Link href={"/"}>
+        <h2 className="text-lg font-semibold">
+          Criminal Identification Platform
+          </h2>
+        </Link>
           <Link href={'/'}>
             <Button size="icon" variant="ghost">
               <XIcon className="h-5 w-5" />
@@ -37,7 +44,7 @@ export function RefinePage() {
                 alt="Generated Face"
                 className="rounded-lg"
                 height="300"
-                src={imageSrc}
+                src={searchParams.get('image')}
                 style={{
                   aspectRatio: "300/300",
                   objectFit: "cover",

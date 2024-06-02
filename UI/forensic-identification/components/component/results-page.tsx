@@ -28,9 +28,12 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { useSearchParams } from "next/navigation";
 
 
 export function ResultsPage() {
+  const searchParams = useSearchParams();
+
   const [imageSrc1, setImageSrc1] = useState(null);
   const [imageSrc2, setImageSrc2] = useState(null);
   const [imageSrc3, setImageSrc3] = useState(null);
@@ -51,7 +54,11 @@ export function ResultsPage() {
   return (
     <div className="flex flex-col h-screen">
     <header className="bg-gray-900 text-gray-50 px-4 py-3 flex items-center justify-between">
-        <h1 className="text-lg font-semibold">Criminal Identification</h1>
+        <Link href={"/"}>
+          <h1 className="text-lg font-semibold">
+          Criminal Identification Platform
+          </h1>
+        </Link>
         <div className="flex items-center gap-2">
           <Button
             className="rounded-full bg-gray-50 bg-opacity-10 p-2 text-gray-50 transition-colors hover:bg-gray-50/20 focus:outline-none focus:ring-2 focus:ring-gray-950 focus:ring-offset-2"
@@ -90,7 +97,10 @@ export function ResultsPage() {
       <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
       <Tooltip>
       <TooltipTrigger>
-        <Link href={'/RefinePageMain'}>
+        <Link href={{
+          pathname: '/RefinePageMain',
+          query: { image: imageSrc1 }
+          }}>
         <div className="group relative flex-1 flex items-center justify-center transition-transform transition-filter duration-300 ease-in-out hover:scale-105 hover:brightness-110">
         {imageSrc1 ? (
         <img
@@ -122,6 +132,10 @@ export function ResultsPage() {
 
         <Tooltip>
         <TooltipTrigger>
+        <Link href={{
+          pathname: '/RefinePageMain',
+          query: { image: imageSrc2 }
+          }}>
         <div className="group relative flex-1 flex items-center justify-center transition-transform transition-filter duration-300 ease-in-out hover:scale-105 hover:brightness-110">
         {imageSrc2 ? (
         <img
@@ -144,6 +158,7 @@ export function ResultsPage() {
             </div>
           )}
         </div>
+        </Link>
         </TooltipTrigger>
         <TooltipContent>
           <p>Click for refinement</p>
@@ -152,6 +167,10 @@ export function ResultsPage() {
 
         <Tooltip>
         <TooltipTrigger>
+        <Link href={{
+          pathname: '/RefinePageMain',
+          query: { image: imageSrc3 }
+          }}>
         <div className="group relative flex-1 flex items-center justify-center transition-transform transition-filter duration-300 ease-in-out hover:scale-105 hover:brightness-110">
         {imageSrc3 ? (
         <img
@@ -174,6 +193,7 @@ export function ResultsPage() {
             </div>
           )}
         </div>
+        </Link>
         </TooltipTrigger>
         <TooltipContent>
           <p>Click for refinement</p>
@@ -184,7 +204,7 @@ export function ResultsPage() {
 
       <div className="mt-10 flex flex-col items-center">
         <p className="mr-4 text-gray-300 pb-3">
-          The prompt entered for this image generation was: "A boy with Green eyes and pointed nose with a sharp jawline."
+          The prompt entered for this image generation was: "{searchParams.get('prompt')}"
         </p>
         <Link href={'/'}>
         <Button className="bg-white text-gray-900 hover:bg-gray-200 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700">

@@ -30,15 +30,21 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 
+import { useState } from "react";
+
 
 export function MainPage() {
   const { toast } = useToast()
-
+  const [details, setDetails] = useState('');
 
   return (
     <div className="flex flex-col h-screen">
       <header className="bg-gray-900/65 text-gray-50 px-4 py-3 flex items-center justify-between fixed top-0 left-0 right-0 backdrop-blur-sm z-50">
-        <h1 className="text-lg font-semibold">Criminal Identification Platform</h1>
+        <Link href={"/"}>
+          <h1 className="text-lg font-semibold">
+          Criminal Identification Platform
+          </h1>
+        </Link>
         <div className="flex items-center gap-2">
           <Button
             className="rounded-full bg-gray-50 bg-opacity-10 p-2 text-gray-50 transition-colors hover:bg-gray-50/20 focus:outline-none focus:ring-2 focus:ring-gray-950 focus:ring-offset-2"
@@ -48,6 +54,7 @@ export function MainPage() {
             <MinimizeIcon className="h-5 w-5 fill-gray-50" />
             <span className="sr-only">Minimize</span>
           </Button>
+          
           <Button
             className="rounded-full bg-gray-50 bg-opacity-10 p-2 text-gray-50 transition-colors hover:bg-gray-50/20 focus:outline-none focus:ring-2 focus:ring-gray-950 focus:ring-offset-2"
             size="icon"
@@ -56,6 +63,7 @@ export function MainPage() {
             <MaximizeIcon className="h-5 w-5 fill-gray-50" />
             <span className="sr-only">Maximize</span>
           </Button>
+
           <Button
             className="rounded-full bg-gray-50 bg-opacity-10 p-2 text-gray-50 transition-colors hover:bg-gray-50/20 focus:outline-none focus:ring-2 focus:ring-gray-950 focus:ring-offset-2"
             size="icon"
@@ -79,6 +87,8 @@ export function MainPage() {
               <Textarea
                 className="w-full rounded-lg bg-gray-50 bg-opacity-10 px-4 py-3 text-sm font-medium text-gray-50 shadow-sm transition-colors hover:bg-gray-50/20 focus:outline-none focus:ring-2 focus:ring-gray-950 focus:ring-offset-2 resize-none min-h-[100px] max-h-[300px]"
                 placeholder="Enter details of the suspect"
+                value={details}
+                onChange={(e) => setDetails(e.target.value)}
               />
               <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center space-x-2">
               
@@ -106,17 +116,36 @@ export function MainPage() {
                 </Tooltip>
                 <Tooltip>
                 <TooltipTrigger>
-                <Link href="/ResultsPageMain">
-                <Button
-                  //make it go to refinePage when clicked
-                  className="rounded-full bg-gray-50 bg-opacity-10 p-2 text-gray-50 transition-colors hover:bg-gray-50/20 focus:outline-none focus:ring-2 focus:ring-gray-950 focus:ring-offset-2"
-                  size="icon"
-                  variant="ghost"
-                >
-                  <SendIcon className="h-5 w-5 fill-gray-50" />
-                  <span className="sr-only">Send</span>
-                </Button>
-                </Link>
+                {details.length > 0 ? (
+                  <Link href={{
+                    pathname: '/ResultsPageMain',
+                    query: { prompt: details },
+                  }}>
+                    <Button
+                      className="rounded-full bg-gray-50 bg-opacity-10 p-2 text-gray-50 transition-colors hover:bg-gray-50/20 focus:outline-none focus:ring-2 focus:ring-gray-950 focus:ring-offset-2"
+                      size="icon"
+                      variant="ghost"
+                    >
+                      <SendIcon className="h-5 w-5 fill-gray-50" />
+                      <span className="sr-only">Send</span>
+                    </Button>
+                  </Link>
+                ) : (
+                  <Button
+                    className="rounded-full bg-gray-50 bg-opacity-10 p-2 text-gray-50 transition-colors hover:bg-gray-50/20 focus:outline-none focus:ring-2 focus:ring-gray-950 focus:ring-offset-2"
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => {
+                      toast({
+                        title: "Please Fill in with a Description!"
+                      });
+                    }}
+                  >
+                    <SendIcon className="h-5 w-5 fill-gray-50" />
+                    <span className="sr-only">Send</span>
+                  </Button>
+                )}
+
                 </TooltipTrigger>
                   <TooltipContent>
                     <p>Send for Generation</p>
@@ -197,7 +226,7 @@ export function MainPage() {
                   alt="Generated Face"
                   className="aspect-square object-cover rounded-md"
                   height="128"
-                  src="/placeholder.svg"
+                  src="/block1.jpg"
                   width="128"
                 />
               </div>
@@ -206,7 +235,7 @@ export function MainPage() {
                   alt="Generated Face"
                   className="aspect-square object-cover rounded-md"
                   height="128"
-                  src="/placeholder.svg"
+                  src="/block2.jpg"
                   width="128"
                 />
               </div>
@@ -215,7 +244,7 @@ export function MainPage() {
                   alt="Generated Face"
                   className="aspect-square object-cover rounded-md"
                   height="128"
-                  src="/placeholder.svg"
+                  src="/block5.jpg"
                   width="128"
                 />
               </div>
@@ -224,7 +253,7 @@ export function MainPage() {
                   alt="Generated Face"
                   className="aspect-square object-cover rounded-md"
                   height="128"
-                  src="/placeholder.svg"
+                  src="/block4.jpg"
                   width="128"
                 />
               </div>
@@ -233,7 +262,7 @@ export function MainPage() {
                   alt="Generated Face"
                   className="aspect-square object-cover rounded-md"
                   height="128"
-                  src="/placeholder.svg"
+                  src="/block3.jpg"
                   width="128"
                 />
               </div>
