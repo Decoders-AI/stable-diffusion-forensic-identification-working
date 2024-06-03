@@ -247,12 +247,9 @@ export function ResultsPage() {
       </TooltipProvider>
 
       <div className="mt-10 flex flex-col items-center">
-        {/* show this paragraph is prompt isn't empty */}
-        {searchParams.get('prompt') && (
-          <p className="mr-4 text-gray-300 pb-3">
-            The prompt entered for this image generation was: "{searchParams.get('prompt')}"
-          </p>
-          )}
+        <p className="mr-4 text-gray-300 pb-3">
+          The prompt entered for this image generation was: "{searchParams.get('prompt')}"
+        </p>
         <Link href={'/'}>
         <Button className="bg-white text-gray-900 hover:bg-gray-200 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700">
           Regenerate Images
