@@ -61,7 +61,7 @@ export function ResultsPage() {
       const response3 = await fetch('https://picsum.photos/200/300');
       setImageSrc3(response3.url);
 
-      const response = await fetch('http://127.0.0.1:8000/myapp/receive');
+      const response = await fetch('http://127.0.0.1:8000/myapp/receive/');
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }
