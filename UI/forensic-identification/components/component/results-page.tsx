@@ -34,7 +34,7 @@ import { useSearchParams } from "next/navigation";
 export function ResultsPage() {
 
   const [imageSrc, setImageSrc] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
 
@@ -47,27 +47,44 @@ export function ResultsPage() {
   useEffect(() => {
     const fetchImage = async () => {
       try {
-        setLoading(true);
+        // setLoading(true);
         setError(null);
 
         const payload = {
           prompt: "An Asian woman in her 40s with light",
         };
 
-      const response1 = await fetch('https://picsum.photos/200/300');
-      setImageSrc1(response1.url);
-      const response2 = await fetch('https://picsum.photos/200/300');
-      setImageSrc2(response2.url);
-      const response3 = await fetch('https://picsum.photos/200/300');
-      setImageSrc3(response3.url);
+      // const response1 = await fetch('https://picsum.photos/200/300');
+      // setImageSrc1(response1.url);
+      // const response2 = await fetch('https://picsum.photos/200/300');
+      // setImageSrc2(response2.url);
+      // const response3 = await fetch('https://picsum.photos/200/300');
+      // setImageSrc3(response3.url);
 
-      const response = await fetch('http://127.0.0.1:8000/myapp/receive/');
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    const blob = await response.blob();
-        const url = URL.createObjectURL(blob);
-        setImageSrc(url);
+      const response = await fetch('http://127.0.0.1:8000/myapp/receivefirst/');
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      setImageSrc(url);
+
+      const response2 = await fetch('http://127.0.0.1:8000/myapp/receivesecond/');
+      if (!response2.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const blob2 = await response2.blob();
+      const url2 = URL.createObjectURL(blob2);
+      setImageSrc2(url2);
+
+      const response3 = await fetch('http://127.0.0.1:8000/myapp/receivethird/');
+      if (!response3.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const blob3 = await response3.blob();
+      const url3 = URL.createObjectURL(blob3);
+      setImageSrc3(url3);
+
       } catch (error) {
         setError(error.message);
       } finally {

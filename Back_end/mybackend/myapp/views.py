@@ -25,7 +25,7 @@ payload = {
     "controlnet_model": 'control_sd15_openpose [fef5e48e]',
 }
 
-def receive_get_request(request):
+def receive_first_get_request(request):
     if request.method == 'GET':
         print("Received")
         # Send the payload to the specified URL through the API.
@@ -55,5 +55,21 @@ def receive_get_request(request):
             return FileResponse(files[0], content_type='image/png')
         else:
             return HttpResponse("Image generation failed", status=500)
+    else:
+        return HttpResponse(status=405)  # Method Not Allowed
+    
+def receive_second_get_request(request):
+    if request.method == 'GET':
+        print("Received")
+
+        return FileResponse(open("output_1.png", 'rb'), content_type='image/png')
+    else:
+        return HttpResponse(status=405)  # Method Not Allowed
+    
+def receive_third_get_request(request):
+    if request.method == 'GET':
+        print("Received")
+
+        return FileResponse(open("output_2.png", 'rb'), content_type='image/png')
     else:
         return HttpResponse(status=405)  # Method Not Allowed
