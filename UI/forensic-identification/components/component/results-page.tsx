@@ -32,6 +32,12 @@ import { useSearchParams } from "next/navigation";
 
 
 export function ResultsPage() {
+
+  const [imageSrc, setImageSrc] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+
   const searchParams = useSearchParams();
 
   const [imageSrc1, setImageSrc1] = useState(null);
@@ -40,16 +46,40 @@ export function ResultsPage() {
 
   useEffect(() => {
     const fetchImage = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const payload = {
+          prompt: "An Asian woman in her 40s with light",
+        };
+
       const response1 = await fetch('https://picsum.photos/200/300');
       setImageSrc1(response1.url);
       const response2 = await fetch('https://picsum.photos/200/300');
       setImageSrc2(response2.url);
       const response3 = await fetch('https://picsum.photos/200/300');
       setImageSrc3(response3.url);
+
+      const response = await fetch('http://127.0.0.1:8000/myapp/receive');
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        setImageSrc(url);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchImage();
   }, []);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="flex flex-col h-screen">
@@ -99,15 +129,15 @@ export function ResultsPage() {
       <TooltipTrigger>
         <Link href={{
           pathname: '/RefinePageMain',
-          query: { image: imageSrc1 }
+          query: { image: imageSrc }
           }}>
         <div className="group relative flex-1 flex items-center justify-center transition-transform transition-filter duration-300 ease-in-out hover:scale-105 hover:brightness-110">
-        {imageSrc1 ? (
+        {imageSrc ? (
         <img
             alt="Forensic Image"
             className="h-full w-full rounded-lg object-cover transition-opacity duration-300"
             height="400"
-            src={imageSrc1}
+            src={imageSrc}
             style={{
               aspectRatio: "400/400",
               objectFit: "cover",
