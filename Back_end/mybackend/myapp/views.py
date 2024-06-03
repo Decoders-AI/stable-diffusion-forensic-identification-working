@@ -57,3 +57,22 @@ def receive_get_request(request):
             return HttpResponse("Image generation failed", status=500)
     else:
         return HttpResponse(status=405)  # Method Not Allowed
+    
+from django.core.files.storage import FileSystemStorage
+from django.views.decorators.csrf import csrf_exempt
+from playsound import playsound
+@csrf_exempt
+def test_view(request):
+    # Check if the request has an file under the 'audio' key
+    if 'audio' in request.FILES:
+        audio_file = request.FILES['audio']
+        print(type(audio_file))
+        # Save the file
+        fs = FileSystemStorage()
+        filename = fs.save(audio_file.name, audio_file)
+        saved_file_path = fs.path(filename)
+        playsound(saved_file_path)
+
+        return HttpResponse(f"File successfully received")
+    else:
+        return HttpResponse("No audio file found in the request.", status=400)
