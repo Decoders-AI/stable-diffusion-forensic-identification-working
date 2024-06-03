@@ -86,3 +86,6 @@ def audiototext(request):
             return HttpResponse("Error processing audio: {}".format(str(e)), status=500)
     else:
         return HttpResponse("No audio file found in the request.", status=400)
+
+def test_view(request):
+    return HttpResponse("Test URL response")
