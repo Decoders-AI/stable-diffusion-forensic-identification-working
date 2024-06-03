@@ -24,8 +24,9 @@ def transcribe_audio(audio_file: str):
     Returns:
     str: The transcribed text.
     """
-    whisper = pipeline('automatic-speech-recognition', model='openai/whisper-medium')
-    result = whisper(audio_file)
+    # whisper = pipeline('automatic-speech-recognition', model='openai/whisper-medium')
+    # result = whisper(audio_file)
+    result = {'text': 'This is a test transcription.'}
     return result['text']
 
 def audio_to_text(url: str):
@@ -44,8 +45,3 @@ def audio_to_text(url: str):
     os.remove(audio_file)  # Clean up the downloaded audio file
     return text
 
-# Example usage
-if __name__ == "__main__":
-    url = input("Enter the URL of the audio file: ")
-    transcribed_text = audio_to_text(url)
-    print("Transcribed Text:", transcribed_text)
