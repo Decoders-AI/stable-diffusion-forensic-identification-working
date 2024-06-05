@@ -7,6 +7,7 @@ from django.utils import timezone
 from openai import OpenAI
 import json
 from django.http import JsonResponse
+import shutil
 
 
 last_request_time = None
@@ -15,6 +16,9 @@ seeds = [0,0,0]
 Choices = []
 
 refinePrompt = ""
+negativePrompt = []
+quality = "low"
+imageNumber = -1
 
 # Point to the local server
 client = OpenAI(base_url="http://192.168.1.25:1234/v1", api_key="lm-studio")
@@ -40,33 +44,47 @@ with open(img_path, 'rb') as f:
 #     "controlnet_model": 'control_sd15_openpose [fef5e48e]',
 # }
 
-def receive_first_get_request(request):
-
+def receive_get_request(request):
     global last_request_time
     global seeds
     global Choices
     global refinePrompt
+    global imageNumber
+    global negativePrompt
+
+    file_paths = ['output_0.png', 'output_1.png', 'output_2.png']
+    with open('loading.gif', 'rb') as loading_file:
+        loading_content = loading_file.read()
+        for file_path in file_paths:
+            with open(file_path, 'wb') as image_file:
+                image_file.write(loading_content)
+
     current_time = timezone.now()
 
-    # If last_request_time is not set or the time difference is more than 5 seconds
+    # If last_request_time is not set or the time difference is more than 10 seconds
     if last_request_time is None or (current_time - last_request_time).total_seconds() > 10:
         last_request_time = current_time
-        
+        refine = False
+
         if request.method == 'GET':
             receivedPrompt = request.GET.get('prompt', "")
             if len(receivedPrompt) > 4 and receivedPrompt != "undefined":
                 refinePrompt = receivedPrompt
+                imageNumber = -1
+                negativePrompt = []
             else:
                 refinePrompt = refinePrompt
-            prompt = refinePrompt + "photo, portrait, face, looking at viewer, plain background"
+                refine = True
+
+            prompt = refinePrompt
             print("Received prompt:", prompt)
 
-            system_message = """You are a prompt generator for a stable diffusion model. You have to extract important facial features form a given discription give a comma seperated string. 
-            # Example 1 - Suspect is a 30 years old Caucasian with neck-length short blond hair. She has a round face with a big forehead and a round chin. Her eyes are very thin and small, and her mouth is small as well. She has filled cheeks and a thin nose.
-            # Output 1 - 30 years old Caucasian woman, neck length short blond hair, round face, very thin small eyes, round chin, small mouth, big forehead, filled cheeks, thin nose
+            system_message = """You are a prompt generator for a stable diffusion model. You have to extract important facial features from a given description give a comma-separated string.
+            # Example - Suspect is a 30 years old Caucasian with neck-length short blond hair. She has a round face with a big forehead and a round chin. Her eyes are very thin and small, and her mouth is small as well. She has filled cheeks and a thin nose.
+            # Output - 30 years old Caucasian woman, neck length short blond hair, round face, very thin small eyes, round chin, small mouth, big forehead, filled cheeks, thin nose
 
-            # Example 2 - Suspect is a 40-year-old East Asian man. He has straight, shoulder-length black hair neatly combed. His face is oval-shaped with high cheekbones and a defined jawline. He possesses almond-shaped brown eyes . His nose is straight and of average size.
-            # Output 2 - 40 years old East Asian man, shoulder length black hair, neatly combed hair, oval face, almond-shaped brown eyes, high cheekbones, defined jawline, medium sized mouth, full lips, straight nose
+            # Example - Suspect is a 40-year-old East Asian man. He has straight, shoulder-length black hair neatly combed. His face is oval-shaped with high cheekbones and a defined jawline. He possesses almond-shaped brown eyes . His nose is straight and of average size.
+            # Output - 40 years old East Asian man, shoulder length black hair, neatly combed hair, oval face, almond-shaped brown eyes, high cheekbones, defined jawline, medium-sized mouth, full lips, straight nose
             """
             completion = client.chat.completions.create(
             
@@ -79,31 +97,30 @@ def receive_first_get_request(request):
             stream=False
             )
 
-            ChoicePhrase = completion.choices[0].message.content[9:].split('Output: ')[-1]
-            Choices = ChoicePhrase.split(',')
-            print("Choices: ")
-            print(Choices)
+            if not refine:
+                ChoicePhrase = completion.choices[0].message.content.split('Output: ')[-1]
+                Choices = ChoicePhrase.split(',')
+                Choices = Choices + ["photo", "portrait", "face", "looking at viewer", "plain background"]
+                print("Choices: ")
+                print(Choices)
+            else:
+                Choices = Choices + ["photo", "portrait", "face", "looking at viewer", "plain background"]
 
             payload = {
-                "prompt": prompt,
-                "negative_prompt": "(side view:1.2) worst quality, low quality, low res, blurry, text, watermark, logo, banner, extra digits, cropped, jpeg artifacts,  error, sketch ,duplicate, monochrome, geometry",
-                "steps": 50,
-                "batch_size": 3,  # Change batch size to 3
+                "prompt": completion.choices[0].message.content + "photo, portrait, face, looking at viewer, plain background" if not refine else refinePrompt,
+                "negative_prompt": ",".join(negativePrompt) + ", (side view:1.2) worst quality, low quality, low res, blurry, text, watermark, logo, banner, extra digits, cropped, jpeg artifacts,  error, sketch ,duplicate, monochrome, geometry",
+                "steps": 100 if quality == "best" else 50 if quality == "medium" else 10,
+                "seed" : -1 if imageNumber == -1 else seeds[imageNumber-1],
+                "batch_size": 1 if refine else 3,  # Change batch size to 1 if refine is True, else 3
                 "n_iter": 1,
-                "alwayson_scripts": {
-                    "controlnet": "openpose"
-                },
-                "controlnet_input_image": [img],
-                "controlnet_module": 'openpose',
-                "controlnet_model": 'control_sd15_openpose [fef5e48e]',
             }
+
+            print(payload)
 
             print("Received")
             # Send the payload to the specified URL through the API.
             response = requests.post(url=f'{url}/sdapi/v1/txt2img', json=payload)
             r = response.json()
-
-            # print(r['info'])
 
             # Parse the JSON string
             data = json.loads(r['info'])
@@ -114,7 +131,7 @@ def receive_first_get_request(request):
             print(seeds)
 
             # Ensure the response contains the expected data
-            if 'images' in r and len(r['images']) == 3:
+            if 'images' in r and len(r['images']) == (1 if refine else 3):
                 images_data = r['images']
                 print("Images generated successfully!")
 
@@ -131,16 +148,21 @@ def receive_first_get_request(request):
                     
                     image_paths.append(image_path)
 
-                # Return the images as the response
-                files = [open(image_path, 'rb') for image_path in image_paths]
-                return FileResponse(files[0], content_type='image/png')
+                return HttpResponse("Images generated successfully", status=200)
             else:
                 return HttpResponse("Image generation failed", status=500)
         else:
             return HttpResponse(status=405)  # Method Not Allowed
     else:
-        # Return a response indicating that the request is too frequent
-        return HttpResponse("API requests are too frequent", status=429)
+        return HttpResponse("API requests are too frequent", status=200)
+
+def receive_first_get_request(request):
+    if request.method == 'GET':
+        print("Received")
+
+        return FileResponse(open("output_0.png", 'rb'), content_type='image/png')
+    else:
+        return HttpResponse(status=405)  # Method Not Allowed
     
 def receive_second_get_request(request):
     if request.method == 'GET':
@@ -170,6 +192,8 @@ def receive_choices_get_request(request):
     
 def receive_sliders_input_post_request(request):
     global refinePrompt
+    global Choices
+    global negativePrompt
 
     if request.method == 'POST':
         try:
@@ -197,9 +221,16 @@ def receive_sliders_input_post_request(request):
 
             refinePrompt = sentence
 
+            print(Choices)
+            print(list(choices_dict.keys()))
+
+            negativePrompt += [choice for choice in Choices if choice not in (list(choices_dict.keys()) + ['photo', 'portrait', 'face', 'looking at viewer', 'plain background'])]
+
+            Choices = list(choices_dict.keys())
+
             # Perform actions with the choices
             print("Choices dictionary:")
-            print(choices_dict)
+            print(Choices)
             print("Generated sentence:")
             print(sentence)
 
@@ -208,3 +239,28 @@ def receive_sliders_input_post_request(request):
             return JsonResponse({'error': str(e)}, status=400)
     else:
         return JsonResponse({'error': 'Only POST requests are allowed'}, status=405)
+    
+def receive_image_num_get_request(request):
+    global imageNumber
+    
+    if request.method == 'GET':
+        try:
+            imageNumber= int(request.GET.get('imagenum', 0))
+            print("Received image number:", imageNumber)
+            return HttpResponse("Received image number successfully", status=200)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    else:
+        return JsonResponse({'error': 'Only GET requests are allowed'}, status=405)
+    
+def receive_quality_get_request(request):
+    global quality
+    if request.method == 'GET':
+        try:
+            quality = request.GET.get('quality', 'best')
+            print("Received quality:", quality)
+            return HttpResponse("Quality set to " + quality, status=200)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    else:
+        return JsonResponse({'error': 'Only GET requests are allowed'}, status=405)

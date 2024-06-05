@@ -58,11 +58,18 @@ export function ResultsPage() {
       // setImageSrc3(response3.url);
 
       const prompt = searchParams.get('prompt');
-      const response = await fetch(`http://127.0.0.1:8000/myapp/receivefirst/?prompt=${encodeURIComponent(prompt)}`);
-      if (!response.ok) {
+
+      
+      const response = await fetch(`http://127.0.0.1:8000/myapp/receive/?prompt=${encodeURIComponent(prompt)}`);
+      // if (!response.ok) {
+      //   throw new Error('Network response was not ok');
+      // }
+
+      const response1 = await fetch('http://127.0.0.1:8000/myapp/receivefirst/');
+      if (!response1.ok) {
         throw new Error('Network response was not ok');
       }
-      const blob = await response.blob();
+      const blob = await response1.blob();
       const url = URL.createObjectURL(blob);
       setImageSrc(url);
 
@@ -83,7 +90,7 @@ export function ResultsPage() {
       setImageSrc3(url3);
 
       } catch (error) {
-        // setError(error.message);
+        setError(error.message);
       } finally {
         setLoading(false);
       }
@@ -138,18 +145,22 @@ export function ResultsPage() {
       </div>
 
       <TooltipProvider>
+
+      {searchParams.get('prompt') ? (
+      
       <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      
       <Tooltip>
       <TooltipTrigger>
         <Link href={{
           pathname: '/RefinePageMain',
-          query: { image: imageSrc }
+          query: { image: imageSrc, imagenum: 1 }
           }}>
         <div className="group relative flex-1 flex items-center justify-center transition-transform transition-filter duration-300 ease-in-out hover:scale-105 hover:brightness-110">
         {imageSrc ? (
         <img
             alt="Forensic Image"
-            className="h-full w-full rounded-lg object-cover transition-opacity duration-300"
+            className="rounded-lg object-cover transition-opacity duration-300"
             height="400"
             src={imageSrc}
             style={{
@@ -174,17 +185,19 @@ export function ResultsPage() {
         </TooltipContent>
         </Tooltip>
 
+        {searchParams.get('prompt') && (
+
         <Tooltip>
         <TooltipTrigger>
         <Link href={{
           pathname: '/RefinePageMain',
-          query: { image: imageSrc2 }
+          query: { image: imageSrc2 , imagenum: 2}
           }}>
         <div className="group relative flex-1 flex items-center justify-center transition-transform transition-filter duration-300 ease-in-out hover:scale-105 hover:brightness-110">
         {imageSrc2 ? (
         <img
             alt="Forensic Image"
-            className="h-full w-full rounded-lg object-cover transition-opacity duration-300"
+            className="rounded-lg object-cover transition-opacity duration-300"
             height="400"
             src={imageSrc2}
             style={{
@@ -208,18 +221,22 @@ export function ResultsPage() {
           <p>Click for refinement</p>
         </TooltipContent>
         </Tooltip>
+        
+        )}
+
+        {searchParams.get('prompt') && (
 
         <Tooltip>
         <TooltipTrigger>
         <Link href={{
           pathname: '/RefinePageMain',
-          query: { image: imageSrc3 }
+          query: { image: imageSrc3 , imagenum: 3}
           }}>
         <div className="group relative flex-1 flex items-center justify-center transition-transform transition-filter duration-300 ease-in-out hover:scale-105 hover:brightness-110">
         {imageSrc3 ? (
         <img
             alt="Forensic Image"
-            className="h-full w-full rounded-lg object-cover transition-opacity duration-300"
+            className="rounded-lg object-cover transition-opacity duration-300"
             height="400"
             src={imageSrc3}
             style={{
@@ -243,8 +260,56 @@ export function ResultsPage() {
           <p>Click for refinement</p>
         </TooltipContent>
         </Tooltip>
+
+        )}
+
       </div>
+
+      ) : (
+
+        <div className="mt-10 gap-6 flex justify-center">
+      
+      <Tooltip>
+      <TooltipTrigger>
+        <Link href={{
+          pathname: '/RefinePageMain',
+          query: { image: imageSrc, imagenum: 1 }
+          }}>
+        <div className="group relative flex-1 flex items-center justify-center transition-transform transition-filter duration-300 ease-in-out hover:scale-105 hover:brightness-110">
+        {imageSrc ? (
+        <img
+            alt="Forensic Image"
+            className="rounded-lg object-cover transition-opacity duration-300"
+            height="400"
+            src={imageSrc}
+            style={{
+              aspectRatio: "400/400",
+              objectFit: "cover",
+            }}
+            width="400"
+          />) : (
+            <div className="flex flex-col space-y-3">
+              <Skeleton className="h-[300px] w-[370px] rounded-xl" />
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-[250px]" />
+                <Skeleton className="h-4 w-[200px]" />
+              </div>
+            </div>
+          )}
+        </div>
+        </Link>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Click for refinement</p>
+        </TooltipContent>
+        </Tooltip>
+
+      </div>
+
+      )}
+
       </TooltipProvider>
+
 
       <div className="mt-10 flex flex-col items-center">
         {/* show this paragraph is prompt isn't empty */}

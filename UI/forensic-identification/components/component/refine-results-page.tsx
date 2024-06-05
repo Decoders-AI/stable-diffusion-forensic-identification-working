@@ -31,7 +31,7 @@ import {
 import { useSearchParams } from "next/navigation";
 
 
-export function ResultsPage() {
+export function RefineResultsPage() {
 
   const [imageSrc, setImageSrc] = useState(null);
   const [loading, setLoading] = useState(false);

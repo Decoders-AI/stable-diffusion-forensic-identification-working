@@ -22,7 +22,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card"
-
+import axios from "axios"; // Import axios for making HTTP requests
 import {
   Tooltip,
   TooltipContent,
@@ -30,12 +30,32 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 
-import { useState } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
+import { useState, useEffect } from "react";
+import { Value } from "@radix-ui/react-select";
+import { send } from "process";
 
 
 export function MainPage() {
   const { toast } = useToast()
   const [details, setDetails] = useState('');
+
+  const sendQuality = async (val) => {
+    console.log(val);
+    toast({
+      title: "Quality Set to " + val + "!",
+      description: "Friday, February 10, 2023 at 5:57 PM",
+    });
+    const response = await fetch(`http://127.0.0.1:8000/myapp/receivequality/?quality=${val}`);
+  };
+
 
   return (
     <div className="flex flex-col h-screen">
@@ -84,14 +104,17 @@ export function MainPage() {
               Quickly and efficiently input information related to criminal identification.
             </p>
             <div className="relative w-full">
+
+              <div className="relative w-[80%]">
               <Textarea
                 className="w-full rounded-lg bg-gray-50 bg-opacity-10 px-4 py-3 text-sm font-medium text-gray-50 shadow-sm transition-colors hover:bg-gray-50/20 focus:outline-none focus:ring-2 focus:ring-gray-950 focus:ring-offset-2 resize-none min-h-[100px] max-h-[300px]"
                 placeholder="Enter details of the suspect"
                 value={details}
                 onChange={(e) => setDetails(e.target.value)}
               />
-              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center space-x-2">
-              
+              </div>
+
+              <div className="absolute right-2 top-1/3 -translate-y-1/2 flex items-center space-x-2">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger>
@@ -153,6 +176,26 @@ export function MainPage() {
                 </Tooltip>
                 </TooltipProvider>
               </div>
+
+              <div className="py-2 flex items-center space-x-2">
+                  <Select onValueChange={(val) => sendQuality(val)}>
+                    <SelectTrigger className="w-[100px]">
+                      <SelectValue placeholder="Quality" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="low">
+                        Low
+                      </SelectItem>
+                      <SelectItem value="medium">
+                        Medium
+                      </SelectItem>
+                      <SelectItem value="best">
+                        Best
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+            
             </div>
           </div>
         </div>
@@ -489,22 +532,27 @@ function MaximizeIcon(props) {
 
 function MicIcon(props) {
   return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
-      <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-      <line x1="12" x2="12" y1="19" y2="22" />
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" {...props}>
+    <path fill="currentColor" d="M15.5 21.125c2.682 0 4.875-2.25 4.875-5V5.875c0-2.75-2.193-5-4.875-5s-4.875 2.25-4.875 5v10.25c0 2.75 2.193 5 4.875 5zM21.376 11v5.125c0 3.308-2.636 6-5.876 6s-5.875-2.69-5.875-6V11h-3v5.125c0 4.443 3.195 8.132 7.373 8.86v2.14h-3.372v3h9.75v-3h-3.377v-2.14c4.18-.726 7.374-4.417 7.374-8.86V11h-2.998z"></path>
     </svg>
+
+
+    // <svg
+    //   {...props}
+    //   xmlns="http://www.w3.org/2000/svg"
+    //   width="24"
+    //   height="24"
+    //   viewBox="0 0 24 24"
+    //   fill="none"
+    //   stroke="currentColor"
+    //   strokeWidth="2"
+    //   strokeLinecap="round"
+    //   strokeLinejoin="round"
+    // >
+    //   <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+    //   <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+    //   <line x1="12" x2="12" y1="19" y2="22" />
+    // </svg>
   )
 }
 
@@ -576,20 +624,24 @@ function SettingsIcon(props) {
 
 function SendIcon(props) {
   return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m22 2-7 20-4-9-9-4Z" />
-      <path d="M22 2 11 13" />
+
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="-1 -1 17 17" {...props}>
+    <path fill="currentColor" fillRule="evenodd" d="M11.821.098a1.62 1.62 0 0 1 2.077 2.076l-3.574 10.712a1.62 1.62 0 0 1-1.168 1.069a1.599 1.599 0 0 1-1.52-.434l-1.918-1.909l-2.014 1.042a.5.5 0 0 1-.73-.457l.083-3.184l7.045-5.117a.625.625 0 1 0-.735-1.012L2.203 8.088l-1.73-1.73a1.6 1.6 0 0 1-.437-1.447a1.62 1.62 0 0 1 1.069-1.238h.003L11.82.097Z" clipRule="evenodd"></path>
     </svg>
+    //  <svg
+    //   {...props}
+    //   xmlns="http://www.w3.org/2000/svg"
+    //   width="24"
+    //   height="24"
+    //   viewBox="0 0 24 24"
+    //   fill="none"
+    //   stroke="currentColor"
+    //   strokeWidth="2"
+    //   strokeLinecap="round"
+    //   strokeLinejoin="round"
+    // >
+    //   <path d="m22 2-7 20-4-9-9-4Z" />
+    //   <path d="M22 2 11 13" />
+    // </svg>
   )
 }

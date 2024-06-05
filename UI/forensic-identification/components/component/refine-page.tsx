@@ -19,6 +19,12 @@ export function RefinePage() {
     const fetchImage = async () => {
       const response = await fetch('https://picsum.photos/200/300');
       setImageSrc(response.url);
+
+      const imagenum = searchParams.get('imagenum');
+      const responsenum = await fetch(`http://127.0.0.1:8000/myapp/receiveimagenum/?imagenum=${encodeURIComponent(imagenum)}`);
+      if (!responsenum.ok) {
+        throw new Error('Network response was not ok');
+      }
     };
 
     const fetchChoicesList = async () => {
@@ -36,7 +42,8 @@ export function RefinePage() {
         console.error('Error fetching choices list:', error);
       }
     };
-
+    
+    
     fetchImage();
     fetchChoicesList();
   }, []);
@@ -96,7 +103,7 @@ export function RefinePage() {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) return parts.pop().split(';').shift();
-  };
+  }
 
   return (
     <div className="flex flex-col items-center justify-center py-10 bg-gradient-to-br from-[#12012e] to-[#732bbf] dark:from-[#12012e] dark:to-[#732bbf]">
