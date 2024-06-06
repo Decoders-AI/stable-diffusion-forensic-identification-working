@@ -24,8 +24,8 @@ def transcribe_audio(audio_file: str):
     Returns:
     str: The transcribed text.
     """
-    # whisper = pipeline('automatic-speech-recognition', model='openai/whisper-medium')
-    # result = whisper(audio_file)
+    whisper = pipeline('automatic-speech-recognition', model='openai/whisper-medium')
+    result = whisper(audio_file)
     result = {'text': 'This is a test transcription.'}
     return result['text']
 
