@@ -110,7 +110,7 @@ export function RefinePage() {
       <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg w-full max-w-2xl">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-800">
           <Link href={"/"}>
-            <h2 className="text-lg font-semibold">Criminal Identification Platform</h2>
+            <h2 className="text-lg font-semibold">Face Canvas</h2>
           </Link>
           <Link href={'/'}>
             <Button size="icon" variant="ghost">

@@ -1,0 +1,388 @@
+### Violence Keywords
+kill
+killed
+killing
+murders
+murdered
+murdering
+attack
+attacked
+attacking
+assaults
+assaulting
+assaulted
+mutilate
+mutilated
+mutilating
+disfigure
+disfigured
+disfiguring
+torture
+tortured
+torturing
+torment
+tormented
+tormenting
+harm
+harmed
+harming
+injure
+injured
+injuring
+wound
+wounded
+wounding
+abuse
+abused
+abusing
+batter
+battered
+battering
+violence
+violent
+aggression
+aggressive
+disturbing act
+extreme violence
+hate crime
+deceased
+corpse
+dead body
+murder
+shoot
+shooting
+shot
+stab
+stabbing
+stabbed
+bomb
+bombing
+exploded
+fight
+fighting
+fought
+beat
+beaten
+beating
+rape
+raped
+raping
+suicide
+suicidal
+kill myself
+self-harm
+self-harming
+cut myself
+manslaughter
+decapitate
+decapitated
+decapitating
+massacre
+genocides
+genocide
+lynch
+lynched
+lynching
+slaughter
+slaughtered
+slaughtering
+execute
+executed
+executing
+execution
+homicidal
+mass killing
+### Hate Speech Keywords
+racial slurs
+gender-based insults
+homophobic language
+discrimination
+humiliated
+crowd laughing
+racist
+sexism
+bigotry
+bigot
+homophobia
+transphobia
+xenophobia
+hate
+hatred
+hating
+derogatory
+slander
+libel
+offensive
+insult
+insulting
+prejudice
+prejudiced
+intolerance
+anti-Semitic
+Islamophobia
+anti-LGBTQ
+anti-gay
+anti-lesbian
+anti-trans
+anti-bisexual
+misogyny
+misogynistic
+misandry
+misandrist
+ableism
+ableist
+ageism
+ageist
+racial hatred
+religious hatred
+ethnic hatred
+gender hatred
+sexual orientation hatred
+racial intolerance
+### Explicit Content Keywords
+sexual
+sex
+porn
+pornography
+nude
+nudity
+suggestive
+erotic
+sensual
+adult
+XXX
+explicit
+intercourse
+masturbation
+genital
+obscene
+obscene language
+provocative
+titillating
+indecent
+lewd
+lascivious
+penetration
+oral sex
+anal sex
+BDSM
+fetish
+kinks
+graphic content
+explicit content
+inappropriate content
+hardcore
+softcore
+pornographic
+sex tape
+sex video
+erotic video
+erotic film
+sexual video
+sexual film
+naked
+nudism
+nudist
+### Illegal Activities Keywords
+drugs
+drug use
+drug dealing
+crime
+criminal
+illegal
+hacking
+hacker
+cybercrime
+bomb
+bombing
+explosives
+theft
+stealing
+stolen
+fraud
+fraudulent
+scam
+counterfeit
+counterfeiting
+trafficking
+human trafficking
+smuggling
+assault
+battery
+violent crime
+arson
+setting fire
+firebomb
+kidnapping
+abducting
+ransom
+bribery
+corrupt
+corruption
+prostitution
+soliciting
+solicitation
+blackmail
+blackmailed
+blackmailing
+forgery
+forged
+forging
+embezzlement
+embezzling
+pirating
+piracy
+poaching
+poached
+poaching
+vandalism
+vandalized
+vandalizing
+laundering
+money laundering
+insider trading
+contraband
+counterfeit goods
+identity theft
+identity fraud
+### Self-Harm Keywords
+suicide
+suicidal
+kill myself
+self-harm
+self-harming
+cut myself
+overdose
+overdos
+OD
+anorexia
+bulimia
+eating disorder
+depression
+depressive
+hopeless
+hopelessness
+despair
+self-destruction
+hurting myself
+injure myself
+hang myself
+drowning
+jump off
+slit wrists
+starving myself
+purge
+purging
+poison
+poisoning
+self-inflicted wounds
+burn myself
+self-immolation
+self-inflicted injuries
+self-mutilation
+harming myself
+injuring myself
+cutting myself
+asphyxiation
+choking myself
+ligature marks
+suicidal thoughts
+### Personal Information Keywords
+phone number
+address
+social security number
+email
+email address
+contact details
+credit card
+bank account
+financial information
+password
+PIN
+login credentials
+full name
+maiden name
+last name
+birthdate
+birth date
+date of birth
+license plate
+driver’s license
+ID number
+medical records
+health information
+insurance number
+personal details
+private information
+confidential information
+sensitive information
+bank details
+routing number
+account number
+identification number
+security questions
+mother’s maiden name
+father’s name
+place of birth
+school attended
+private data
+personal identification
+### Disturbing Images Keywords
+surgically mutilated
+disturbing act
+extreme suffering
+tortured
+bloodstained
+blood-stained
+bloody
+deceased
+flies buzzing
+dead body
+extreme violence
+shattered mirror
+grotesque
+disturbing smile
+unsettling smile
+contorted body
+twisted limbs
+deformed
+consumed by shadows
+darkness consuming
+multiple eyes
+piercing blue eye
+missing eye
+swirling vortex
+sharp
+pointed teeth
+visible heart
+emotionless
+vacant expression
+disfigured
+mangled
+repulsive
+horrifying
+monstrous
+nightmarish
+blood-curdling
+bone-chilling
+spine-tingling
+macabre
+gruesome
+gory
+grisly
+ghastly
+cadaver
+morbid
+mutilation
+amputation
+decapitation
+autopsy
+disembowelment
+evisceration
+exsanguination
+vivisection
+necrosis
+putrefaction
+rot
+decayed flesh
+exposed organs

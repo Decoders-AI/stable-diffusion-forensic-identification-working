@@ -43,6 +43,9 @@ export function ResultsPage() {
   const [imageSrc1, setImageSrc1] = useState(null);
   const [imageSrc2, setImageSrc2] = useState(null);
   const [imageSrc3, setImageSrc3] = useState(null);
+  const [ref, setRef] = useState(null);
+  const [processingTime, setProcessingTime] = useState(0.0);
+  const [timerstop, setTimerStop] = useState(false);
 
   useEffect(() => {
     const fetchImage = async () => {
@@ -61,9 +64,9 @@ export function ResultsPage() {
 
       
       const response = await fetch(`http://127.0.0.1:8000/myapp/receive/?prompt=${encodeURIComponent(prompt)}`);
-      // if (!response.ok) {
-      //   throw new Error('Network response was not ok');
-      // }
+      if (response.ok) {
+        setTimerStop(true);
+      }
 
       const response1 = await fetch('http://127.0.0.1:8000/myapp/receivefirst/');
       if (!response1.ok) {
@@ -89,14 +92,28 @@ export function ResultsPage() {
       const url3 = URL.createObjectURL(blob3);
       setImageSrc3(url3);
 
+      const response4 = await fetch('http://127.0.0.1:8000/myapp/ref/');
+      if (!response4.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const blob4 = await response4.blob();
+      const url4 = URL.createObjectURL(blob4);
+      setRef(url4);
+
       } catch (error) {
-        setError(error.message);
+        // setError(error.message);
       } finally {
         setLoading(false);
       }
     };
 
     fetchImage();
+
+    const interval = setInterval(() => {
+      setProcessingTime(prevTime => prevTime + 0.1);
+    }, 100);
+
+    return () => clearInterval(interval);
   }, []);
 
   if (loading) return <div>Loading...</div>;
@@ -107,7 +124,7 @@ export function ResultsPage() {
     <header className="bg-gray-900 text-gray-50 px-4 py-3 flex items-center justify-between">
         <Link href={"/"}>
           <h1 className="text-lg font-semibold">
-          Criminal Identification Platform
+          Face Canvas
           </h1>
         </Link>
         <div className="flex items-center gap-2">
@@ -140,7 +157,7 @@ export function ResultsPage() {
 
     <main className="mx-0 px-20 py-10 md:py-12 lg:py-14 bg-gradient-to-br from-[#12012e] to-[#732bbf]">
       <div className="mx-auto max-w-3xl text-center">
-        <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Forensic Identification Results</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Forensic Face Generation Results</h1>
         <p className="mt-4 text-lg text-gray-300">Choose a result to refine</p>
       </div>
 
@@ -149,7 +166,8 @@ export function ResultsPage() {
       {searchParams.get('prompt') ? (
       
       <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      
+    
+      <div className="flex flex-col items-center justify-center">      
       <Tooltip>
       <TooltipTrigger>
         <Link href={{
@@ -177,7 +195,13 @@ export function ResultsPage() {
               </div>
             </div>
           )}
+          {timerstop ?(
+            <></>
+          ) : (
+            <div className="absolute left-5 bottom-2" style={{ opacity: 0.5 , fontFamily: 'Arial' ,fontSize: '1em' ,fontWeight: 'bold'}}>{processingTime.toFixed(1)}S</div>
+          )}
         </div>
+        
         </Link>
         </TooltipTrigger>
         <TooltipContent>
@@ -185,8 +209,14 @@ export function ResultsPage() {
         </TooltipContent>
         </Tooltip>
 
+        <a href={imageSrc} download="image1.png">
+          <Button className="mt-5 bg-gray-900 text-gray-50">Download Image</Button>
+        </a>
+        </div>
+
         {searchParams.get('prompt') && (
 
+        <div className="flex flex-col items-center justify-center">
         <Tooltip>
         <TooltipTrigger>
         <Link href={{
@@ -214,6 +244,11 @@ export function ResultsPage() {
               </div>
             </div>
           )}
+        {timerstop ?(
+            <></>
+          ) : (
+            <div className="absolute left-5 bottom-2 " style={{ opacity: 0.5 , fontFamily: 'Arial' ,fontSize: '1em' ,fontWeight: 'bold' }}>{processingTime.toFixed(1)}S</div>
+          )}
         </div>
         </Link>
         </TooltipTrigger>
@@ -221,11 +256,15 @@ export function ResultsPage() {
           <p>Click for refinement</p>
         </TooltipContent>
         </Tooltip>
+        <a href={imageSrc2} download="image2.png">
+          <Button className="mt-5 bg-gray-900 text-gray-50">Download Image</Button>
+        </a>
+        </div>
         
         )}
 
         {searchParams.get('prompt') && (
-
+        <div className="flex flex-col items-center justify-center">
         <Tooltip>
         <TooltipTrigger>
         <Link href={{
@@ -253,6 +292,11 @@ export function ResultsPage() {
               </div>
             </div>
           )}
+        {timerstop ?(
+            <></>
+          ) : (
+            <div className="absolute left-5 bottom-2 " style={{ opacity: 0.5 , fontFamily: 'Arial' ,fontSize: '1em' ,fontWeight: 'bold' }}>{processingTime.toFixed(1)}S</div>
+          )}
         </div>
         </Link>
         </TooltipTrigger>
@@ -260,15 +304,66 @@ export function ResultsPage() {
           <p>Click for refinement</p>
         </TooltipContent>
         </Tooltip>
+          <a href={imageSrc3} download="image3.png">
+          <Button className="mt-5 bg-gray-900 text-gray-50">Download Image</Button>
+        </a>
+        </div>
 
         )}
-
       </div>
 
       ) : (
 
         <div className="mt-10 gap-6 flex justify-center">
       
+      <div className="flex flex-col items-center justify-center px-10">
+      <Tooltip>
+      <TooltipTrigger>
+        <Link href={{
+          pathname: '/RefinePageMain',
+          query: { image: ref, imagenum: 0 }
+          }}>
+        <div className="group relative flex-1 flex items-center justify-center transition-transform transition-filter duration-300 ease-in-out hover:scale-105 hover:brightness-110">
+        {imageSrc ? (
+        <img
+            alt="Forensic Image"
+            className="rounded-lg object-cover transition-opacity duration-300"
+            height="400"
+            src={ref}
+            style={{
+              aspectRatio: "400/400",
+              objectFit: "cover",
+            }}
+            width="400"
+          />
+        ) : (
+            <div className="flex flex-col space-y-3">
+              <Skeleton className="h-[300px] w-[370px] rounded-xl" />
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-[250px]" />
+                <Skeleton className="h-4 w-[200px]" />
+              </div>
+            </div>
+          )}
+        {timerstop ?(
+            <></>
+          ) : (
+            <div className="absolute left-5 bottom-2" style={{ opacity: 0.5 , fontFamily: 'Arial' ,fontSize: '1em' ,fontWeight: 'bold' }}>{processingTime.toFixed(1)}S</div>
+          )}
+        </div>
+        </Link>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Click for refinement</p>
+        </TooltipContent>
+        </Tooltip>
+        <a href={ref} download="Reference.png">
+          <Button className="mt-5 bg-gray-900 text-gray-50">Download Image</Button>
+        </a>
+        </div>
+
+
+        <div className="flex flex-col items-center justify-center px-10">
       <Tooltip>
       <TooltipTrigger>
         <Link href={{
@@ -296,6 +391,11 @@ export function ResultsPage() {
               </div>
             </div>
           )}
+        {timerstop ?(
+            <></>
+          ) : (
+            <div className="absolute left-5 bottom-2 " style={{ opacity: 0.5 , fontFamily: 'Arial' ,fontSize: '1em' ,fontWeight: 'bold' }}>{processingTime.toFixed(1)}S</div>
+          )}
         </div>
         </Link>
         </TooltipTrigger>
@@ -303,6 +403,10 @@ export function ResultsPage() {
           <p>Click for refinement</p>
         </TooltipContent>
         </Tooltip>
+        <a href={imageSrc} download="image1.png">
+          <Button className="mt-5 bg-gray-900 text-gray-50">Download Image</Button>
+        </a>
+        </div>
 
       </div>
 
@@ -328,7 +432,7 @@ export function ResultsPage() {
     </main>
 
     <footer className="bg-gray-900 text-gray-50 px-4 py-3 flex items-center justify-between">
-        <p className="text-sm">© 2024 Criminal Identification</p>
+        <p className="text-sm">© 2024 Criminal Face Generation</p>
         <div className="flex items-center gap-2">
           <Button
             className="rounded-full bg-gray-50 bg-opacity-10 p-2 text-gray-50 transition-colors hover:bg-gray-50/20 focus:outline-none focus:ring-2 focus:ring-gray-950 focus:ring-offset-2"

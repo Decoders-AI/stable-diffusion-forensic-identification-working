@@ -8,6 +8,7 @@ from openai import OpenAI
 import json
 from django.http import JsonResponse
 import shutil
+import re
 
 
 last_request_time = None
@@ -17,11 +18,11 @@ Choices = []
 
 refinePrompt = ""
 negativePrompt = []
-quality = "low"
+quality = "speed"
 imageNumber = -1
 
 # Point to the local server
-client = OpenAI(base_url="http://192.168.1.25:1234/v1", api_key="lm-studio")
+client = OpenAI(base_url="http://192.168.137.2:1234/v1", api_key="lm-studio")
 
 # Define the URL and the payload to send.
 url = "http://127.0.0.1:7860"
@@ -53,16 +54,20 @@ def receive_get_request(request):
     global negativePrompt
 
     file_paths = ['output_0.png', 'output_1.png', 'output_2.png']
+
     with open('loading.gif', 'rb') as loading_file:
         loading_content = loading_file.read()
-        for file_path in file_paths:
+        for file_path in file_paths:    
             with open(file_path, 'wb') as image_file:
                 image_file.write(loading_content)
+
+    with open("control.jpg", 'rb') as f:
+        control_image = base64.b64encode(f.read()).decode()
 
     current_time = timezone.now()
 
     # If last_request_time is not set or the time difference is more than 10 seconds
-    if last_request_time is None or (current_time - last_request_time).total_seconds() > 10:
+    if last_request_time is None or (current_time - last_request_time).total_seconds() > 20:
         last_request_time = current_time
         refine = False
 
@@ -79,23 +84,25 @@ def receive_get_request(request):
             prompt = refinePrompt
             print("Received prompt:", prompt)
 
-            system_message = """You are a prompt generator for a stable diffusion model. You have to extract important facial features from a given description give a comma-separated string.
-            # Example - Suspect is a 30 years old Caucasian with neck-length short blond hair. She has a round face with a big forehead and a round chin. Her eyes are very thin and small, and her mouth is small as well. She has filled cheeks and a thin nose.
-            # Output - 30 years old Caucasian woman, neck length short blond hair, round face, very thin small eyes, round chin, small mouth, big forehead, filled cheeks, thin nose
+            if not refine:
 
-            # Example - Suspect is a 40-year-old East Asian man. He has straight, shoulder-length black hair neatly combed. His face is oval-shaped with high cheekbones and a defined jawline. He possesses almond-shaped brown eyes . His nose is straight and of average size.
-            # Output - 40 years old East Asian man, shoulder length black hair, neatly combed hair, oval face, almond-shaped brown eyes, high cheekbones, defined jawline, medium-sized mouth, full lips, straight nose
-            """
-            completion = client.chat.completions.create(
-            
-            messages=[
-                {"role": "system", "content": system_message},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.7,
-            model="TheBloke/Mistral-7B-Instruct-v0.2-GGUF/mistral-7b-instruct-v0.2.Q4_K_S.gguf",
-            stream=False
-            )
+                system_message = """You are a prompt generator for a stable diffusion model. You have to extract important facial features from a given description give a comma-separated string.
+                # Example - Suspect is a 30 years old Caucasian with neck-length short blond hair. She has a round face with a big forehead and a round chin. Her eyes are very thin and small, and her mouth is small as well. She has filled cheeks and a thin nose.
+                # Output - 30 years old Caucasian woman, neck length short blond hair, round face, very thin small eyes, round chin, small mouth, big forehead, filled cheeks, thin nose
+
+                # Example - Suspect is a 40-year-old East Asian man. He has straight, shoulder-length black hair neatly combed. His face is oval-shaped with high cheekbones and a defined jawline. He possesses almond-shaped brown eyes . His nose is straight and of average size.
+                # Output - 40 years old East Asian man, shoulder length black hair, neatly combed hair, oval face, almond-shaped brown eyes, high cheekbones, defined jawline, medium-sized mouth, full lips, straight nose
+                """
+                completion = client.chat.completions.create(
+                
+                messages=[
+                    {"role": "system", "content": system_message},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.7,
+                model="TheBloke/MISTRAL-7B-INSTRUCT-GGUF/mistral.gguf",
+                stream=False
+                )
 
             if not refine:
                 ChoicePhrase = completion.choices[0].message.content.split('Output: ')[-1]
@@ -106,20 +113,56 @@ def receive_get_request(request):
             else:
                 Choices = Choices + ["photo", "portrait", "face", "looking at viewer", "plain background"]
 
-            payload = {
-                "prompt": completion.choices[0].message.content + "photo, portrait, face, looking at viewer, plain background" if not refine else refinePrompt,
-                "negative_prompt": ",".join(negativePrompt) + ", (side view:1.2) worst quality, low quality, low res, blurry, text, watermark, logo, banner, extra digits, cropped, jpeg artifacts,  error, sketch ,duplicate, monochrome, geometry",
-                "steps": 100 if quality == "best" else 50 if quality == "medium" else 10,
-                "seed" : -1 if imageNumber == -1 else seeds[imageNumber-1],
-                "batch_size": 1 if refine else 3,  # Change batch size to 1 if refine is True, else 3
-                "n_iter": 1,
-            }
+            if not refine:
+                payload = {
+                    "prompt": completion.choices[0].message.content + "photo, portrait, face, (looking at viewer:1.5), plain background" if not refine else refinePrompt,
+                    "negative_prompt": ",".join(negativePrompt) + ", (side view:1.2) worst quality, low quality, low res, blurry, text, watermark, logo, banner, extra digits, cropped, jpeg artifacts,  error, sketch ,duplicate, monochrome, geometry",
+                    "steps": 100 if quality == "quality" else 20,
+                    "seed" : -1, #3195273956,
+                    "subseed": -1,
+                    "batch_size": 1 if refine else 3,  # Change batch size to 1 if refine is True, else 3
+                    "n_iter": 1,
+                    # "alwayson_scripts": {
+                    #     "controlnet": {
+                    #         "args": [
+                    #             {
+                    #                 "input_image": control_image,
+                    #                 "model": "control_v11p_sd15_openpose [cab727d4]",
+                    #                 "module": "openpose",
+                    #                 "resize_mode":1,
+                    #                 "control_mode":0,
+                    #                 "weight":1,
+                    #             },
+                    #         ]
+                    #     }
+                    # },
+                }
+            else:
+                with open("output_backup_"+str(imageNumber-1)+".png", "rb") as file:
+                    input =  base64.b64encode(file.read()).decode()
+
+                shutil.copyfile("output_backup_"+str(imageNumber-1)+".png", "ref.png")
+
+                payload = {
+                    "prompt": refinePrompt,
+                    "negative_prompt": ",".join(negativePrompt) + ", (side view:1.2) worst quality, low quality, low res, blurry, text, watermark, logo, banner, extra digits, cropped, jpeg artifacts,  error, sketch ,duplicate, monochrome, geometry",
+                    "steps": 100 if quality == "quality" else 20,
+                    "seed" : -1 if imageNumber == -1 else seeds[imageNumber-1],
+                    "batch_size": 1,  # Change batch size to 1 if refine is True, else 3
+                    "n_iter": 1,
+                    "init_images": [
+                        input
+                    ],
+                }
 
             print(payload)
 
             print("Received")
             # Send the payload to the specified URL through the API.
-            response = requests.post(url=f'{url}/sdapi/v1/txt2img', json=payload)
+            if not refine:
+                response = requests.post(url=f'{url}/sdapi/v1/txt2img', json=payload)
+            else:
+                response = requests.post(url=f'{url}/sdapi/v1/img2img', json=payload)
             r = response.json()
 
             # Parse the JSON string
@@ -146,6 +189,8 @@ def receive_get_request(request):
                     with open(image_path, 'wb') as f:
                         f.write(base64.b64decode(image_data))
                     
+                    shutil.copyfile(image_path, "output_backup_"+str(i)+".png")
+
                     image_paths.append(image_path)
 
                 return HttpResponse("Images generated successfully", status=200)
@@ -154,7 +199,7 @@ def receive_get_request(request):
         else:
             return HttpResponse(status=405)  # Method Not Allowed
     else:
-        return HttpResponse("API requests are too frequent", status=200)
+        return HttpResponse("API requests are too frequent", status=400)
 
 def receive_first_get_request(request):
     if request.method == 'GET':
@@ -177,6 +222,14 @@ def receive_third_get_request(request):
         print("Received")
 
         return FileResponse(open("output_2.png", 'rb'), content_type='image/png')
+    else:
+        return HttpResponse(status=405)  # Method Not Allowed
+    
+def receive_ref_get_request(request):
+    if request.method == 'GET':
+        print("Received")
+
+        return FileResponse(open("ref.png", 'rb'), content_type='image/png')
     else:
         return HttpResponse(status=405)  # Method Not Allowed
     
@@ -215,7 +268,10 @@ def receive_sliders_input_post_request(request):
             sentence_parts = []
             for choice, slider_value in choices_dict.items():
                 slider_value_one_dec = round(slider_value, 1)
-                sentence_parts.append(f"({choice}:{slider_value_one_dec}),")
+                if slider_value_one_dec == 1.2:
+                    sentence_parts.append(f"{choice},")
+                else:
+                    sentence_parts.append(f"({choice}:{slider_value_one_dec}),")
 
             sentence = "".join(sentence_parts)
 
@@ -264,3 +320,36 @@ def receive_quality_get_request(request):
             return JsonResponse({'error': str(e)}, status=400)
     else:
         return JsonResponse({'error': 'Only GET requests are allowed'}, status=405)
+
+def read_keywords(file_path):
+    with open(file_path, 'r') as file:
+        keywords = [line.strip() for line in file]
+    return keywords
+
+def classify_input(input_text, unsafe_keywords):
+    # Check for unsafe keywords
+    for keyword in unsafe_keywords:
+        if re.search(r'\b' + re.escape(keyword) + r'\b', input_text, re.IGNORECASE):
+            return "Unsafe"
+    return "Safe"
+
+def promptSafeCheck(request):
+    # Read keywords from text file
+    keyword_file = 'filter.txt'
+    unsafe_keywords = read_keywords(keyword_file)
+
+    # print("Unsafe keywords:", unsafe_keywords)
+
+    if request.method == 'GET':
+        prompt = request.GET.get('prompt', '')
+        print("Received prompt:", prompt)
+
+        # Check if the input prompt is safe
+        classification = classify_input(prompt, unsafe_keywords)
+
+        print("Classification:", classification)
+        if classification == "Safe":
+            return JsonResponse({'message': 'safe'}, status=200)
+        else:
+            return JsonResponse({'message': 'unsafe'}, status=200)
+
