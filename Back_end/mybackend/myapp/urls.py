@@ -23,4 +23,5 @@ urlpatterns = [
     path('receiveimagenum/', receive_image_num_get_request, name='receive_image_num_get_request'),
     path('receivequality/', receive_quality_get_request, name='receive_quality_get_request'),
     path('filter/', promptSafeCheck, name='promptSafeCheck'),
+    path('audiototext/', audiototext, name='audiototext'),
 ]
