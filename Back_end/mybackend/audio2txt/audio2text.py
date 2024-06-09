@@ -12,7 +12,7 @@ def transcribe_audio(audio_file: str):
     Returns:
     str: The transcribed text.
     """
-    model_dir = "model/whisper-medium" # Specify the local directory where the model files are stored 
+    model_dir = "whisper-medium/" # Specify the local directory where the model files are stored 
     
     #Modify the pipeline creation to load from local directory
     whisper = pipeline(
