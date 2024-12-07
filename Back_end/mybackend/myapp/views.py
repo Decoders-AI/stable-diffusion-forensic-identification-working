@@ -10,6 +10,10 @@ from django.http import JsonResponse
 import shutil
 import re
 
+from django.core.files.storage import FileSystemStorage
+from django.views.decorators.csrf import csrf_exempt
+from audio2txt import audio2text
+
 
 last_request_time = None
 
@@ -353,3 +357,26 @@ def promptSafeCheck(request):
         else:
             return JsonResponse({'message': 'unsafe'}, status=200)
 
+@csrf_exempt
+def audiototext(request):
+    # Check if the request has a file under the 'audio' key
+    if 'audio' in request.FILES:
+        audio_file = request.FILES['audio']
+        # Save the file
+        fs = FileSystemStorage()
+        filename = fs.save(audio_file.name, audio_file)
+        saved_file_path = fs.path(filename)
+        
+        try:
+            # Transcribe audio and get the result
+            transcribed_text = audio2text.transcribe_audio(saved_file_path)
+
+            # Delete the saved file
+            os.remove(saved_file_path)
+
+            return HttpResponse(transcribed_text, status=200)
+        except Exception as e:
+            # If an error occurs during transcription or file deletion, return an error response
+            return HttpResponse("Error processing audio: {}".format(str(e)), status=500)
+    else:
+        return HttpResponse("No audio file found in the request.", status=400)
